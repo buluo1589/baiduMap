@@ -1,0 +1,7 @@
+<RCC>
+    <qresource prefix="/">
+        <file>qwebchannel.js</file>
+        <file>baiduMap.html</file>
+        <file>baidu.js</file>
+    </qresource>
+</RCC>

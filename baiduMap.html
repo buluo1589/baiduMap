@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style type="text/css">
+        body,
+        html {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            font-family: "微软雅黑";
+        }
+
+        #container {
+            width: 100%;
+            height: 100%;
+        }
+
+        #result {
+            position: fixed;
+            top: 10px;
+            left: 20px;
+            width: 300px;
+            height: 40px;
+            line-height: 40px;
+            text-align: center;
+            background: #fff;
+            box-shadow: 0 2px 6px 0 rgba(27, 142, 236, 0.5);
+            border-radius: 7px;
+            z-index: 99;
+        }
+    </style>
+    <script type="text/javascript"
+        src="https://api.map.baidu.com/api?type="></script>
+    <script src="baidu.js"></script>
+    <script src="qwebchannel.js"></script>
+    <title>根据起点和终点经纬度驾车导航</title>
+</head>
+
+<body>
+    <div id="container"></div>
+    <div id='result'>根据起点和终点经纬度驾车导航路线</div>
+    <script>
+        var map = new BMapGL.Map("container");
+        map.centerAndZoom(new BMapGL.Point(centX, centY), 11);
+
+        var p1 = new BMapGL.Point(startX, startY);
+        var p2 = new BMapGL.Point(targetX, targetY);
+
+        var driving = new BMapGL.DrivingRoute(map, { renderOptions: { map: map, autoViewport: true } });
+        driving.search(p1, p2);
+
+        new QWebChannel(qt.webChannelTransport, function (channel) {
+            window.bridge_js = channel.objects.my_bridge;
+        });
+        map.addEventListener("click", function (e) {
+            [lon,lat]=bd09towgs84(e.latlng.lng,e.latlng.lat);
+            Set_target(lon,lat);
+        });
+
+        function Set_target(longitude, latitude)  //给qt调用的接口
+        {
+            bridge_js.getCoordinate(longitude,latitude);
+
+            [lon,lat]=wgs84tobd09(longitude,latitude);
+
+            targetX=lon;
+            targetY=lat;
+
+            p1 = new BMapGL.Point(startX, startY);
+            p2 = new BMapGL.Point(targetX, targetY);
+
+            driving.search(p1, p2);
+        };
+
+        function Set_start(longitude, latitude)
+        {
+            [lon,lat]=wgs84tobd09(longitude,latitude);
+
+
+            startX=lon;
+            startY=lat;
+
+            p1 = new BMapGL.Point(startX, startY);
+            p2 = new BMapGL.Point(targetX, targetY);
+
+            driving.search(p1, p2);
+        };
+
+        function Set_cent(longitude, latitude)
+        {
+            // centX=longitude;
+            // centY=latitude;
+            [centX, centY]=wgs84tobd09(longitude, latitude);
+            map.centerAndZoom(new BMapGL.Point(centX, centY), 19);
+            // driving.search(p1, p2);
+        };
+
+        function init_L(longitude, latitude)
+        {
+            // alert('经纬度：' + longitude + ',' + latitude);
+            [lon,lat]=wgs84tobd09(longitude,latitude);
+
+            startX=lon;
+            startY=lat;
+
+            targetX=lon;
+            targetY=lat;
+
+
+            centX = lon;
+            centY = lat;
+
+            p1 = new BMapGL.Point(startX, startY);
+            p2 = new BMapGL.Point(targetX, targetY);
+
+            bridge_js.getCoordinate(longitude,latitude);
+
+            map.centerAndZoom(new BMapGL.Point(centX, centY), 11);
+            driving.search(p1, p2);
+        }
+    </script>
+</body>
+
+</html>

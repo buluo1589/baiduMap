@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<RCC>
+    <qresource prefix="/">
+        <file alias="qwebchannel.js">../../qwebchannel.js</file>
+        <file alias="baiduMap.html">../../baiduMap.html</file>
+        <file alias="baidu.js">../../baidu.js</file>
+    </qresource>
+</RCC>
